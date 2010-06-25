@@ -30,32 +30,25 @@ void setup()   {
 
 void loop()                     
 {
-  char cprev;
-  char rprev;
-
-  refreshScreen();
-  for(int r=0; r<3; r++) {
-    for(int c=0; c<3; c++) {
-      on(r, c);
-      cprev = c;
-      rprev = r;
-      refreshScreen();
-      delay(400);
-      off(rprev, cprev);
-      refreshScreen();
-    }
-  }
+  on(0,0);
+  on(1,1);
+  on(2,2);
+  on(0,1);
 }
 
 void on(char r, char c) {
-  pixels[r][c] = LOW;
+  char oldr = digitalRead(row[r]);
+  char oldc = digitalRead(col[c]);
+
+  digitalWrite(row[r], HIGH);
+  digitalWrite(col[c], LOW);
+  delay(1);
+
+  digitalWrite(row[r], oldr);
+  digitalWrite(col[c], oldc);
 }
 
-void off(char r, char c) {
-  pixels[r][c] = HIGH;
-}
-
-void refreshScreen() {
+void refresh_screen() {
   int r,c;
   lighton=false;
 
@@ -75,4 +68,3 @@ void refreshScreen() {
     }
   }
 }
-
