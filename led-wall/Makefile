@@ -43,6 +43,7 @@ AVRDUDE_PROGRAMMER = stk500v1
 MCU = atmega328p
 F_CPU = 16000000
 RESET_ARDUINO_CMD = python ./reset-arduino.py $(PORT)
+INCLUDE_DIR = ./src
 
 ############################################################################
 # Below here nothing should be changed...
@@ -93,8 +94,8 @@ CDEFS = -DF_CPU=$(F_CPU)L -DARDUINO=$(VERSION)
 CXXDEFS = -DF_CPU=$(F_CPU)L -DARDUINO=$(VERSION)
 
 # Place -I options here
-CINCS = -I$(ARDUINO)
-CXXINCS = -I$(ARDUINO)
+CINCS = -I$(ARDUINO) -I$(INCLUDE_DIR)
+CXXINCS = -I$(ARDUINO) -I$(INCLUDE_DIR)
 
 # Compiler flag to set the C Standard level.
 # c89   - "ANSI" C
