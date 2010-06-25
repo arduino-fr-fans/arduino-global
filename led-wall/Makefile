@@ -43,7 +43,7 @@ AVRDUDE_PROGRAMMER = stk500v1
 MCU = atmega328p
 F_CPU = 16000000
 RESET_ARDUINO_CMD = python ./reset-arduino.py $(PORT)
-INCLUDE_DIR = ./src
+INCLUDE_DIR = .
 
 ############################################################################
 # Below here nothing should be changed...
