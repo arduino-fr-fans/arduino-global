@@ -3,6 +3,6 @@
 
 void on(char, char);
 void off(char, char);
-void refreshScreen();
+void refresh_screen();
 
 #endif

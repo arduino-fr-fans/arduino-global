@@ -14,4 +14,4 @@ generated
 *.swp
 *~
 .settings
-
+build-cli
