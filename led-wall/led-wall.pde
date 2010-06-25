@@ -30,23 +30,21 @@ void setup()   {
 
 void loop()                     
 {
-digitalWrite(11, LOW);
-digitalWrite(10, HIGH);
-//  char cprev;
-//  char rprev;
-//
-//refreshScreen();
-//for(int r=0; r<3; r++) {
-//    for(int c=0; c<3; c++) {
-//      on(r, c);
-//      cprev = c;
-//      rprev = r;
-//      refreshScreen();
-//      delay(400);
-//      off(rprev, cprev);
-//      refreshScreen();
-//    }
-//  }
+  char cprev;
+  char rprev;
+
+  refreshScreen();
+  for(int r=0; r<3; r++) {
+    for(int c=0; c<3; c++) {
+      on(r, c);
+      cprev = c;
+      rprev = r;
+      refreshScreen();
+      delay(400);
+      off(rprev, cprev);
+      refreshScreen();
+    }
+  }
 }
 
 void on(char r, char c) {
