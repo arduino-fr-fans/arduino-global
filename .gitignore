@@ -1,0 +1,17 @@
+applet
+*.hex
+*.o
+*.a
+*.elf
+.project
+.classpath
+nbproject
+lib
+Thumbs.db
+target
+generated
+*.orig
+*.swp
+*~
+.settings
+
