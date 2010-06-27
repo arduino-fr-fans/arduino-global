@@ -1,0 +1,2 @@
+Un petit projet pour faire varier l'intensité lumineuse d'une led.
+Brancher la led sur la pin 3 (pwm), le potar sur la pin 1 (analog in) et zou :)
