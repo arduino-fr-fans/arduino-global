@@ -1,0 +1,33 @@
+Led Wall
+========
+
+1. Comment utiliser ?
+---------------------
+
+==- Raccourcis -==
+  +          Passe en mode 'allumage'
+  -          Passe en mode 'extinction'
+  0 ... 8    Allume/eteind la LED numero 'n'
+  a          Allume/eteind toutes les LEDs
+
+
+==- Mapping des LEDs -==
+
+0  1  2
+3  4  5
+6  7  8
+
+==- Utilisation du script bash serial_send.sh -==
+
+2 possibilites :
+  - interactive
+  - ligne de commande
+
+Mode interactif
+  - Lancer simplement le script et envoyer les commandes en appyant sur les touches correspondantes !
+
+Mode ligne de commande
+  - envoyer les commandes en effectuant un echo et en tubant avec le script.
+    Exemple :
+     $> echo "+0123" | ./serial_send.sh
+    Allumera les LEDs 0, 1, 2 et 3
