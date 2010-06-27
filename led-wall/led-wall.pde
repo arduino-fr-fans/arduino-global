@@ -26,7 +26,8 @@ void setup()   {
     digitalWrite(col[i], HIGH);
   }
 
-  clear_matrix();
+  // All LED off
+  set_matrix(false);
 }
 
 void loop()                     
@@ -36,7 +37,7 @@ void loop()
 
     switch (inByte) {
       case 'a':
-        clear_matrix();
+        set_matrix(mode);
         break;
       case '+':
         mode = true;
@@ -85,8 +86,8 @@ void off(char r, char c) {
   digitalWrite(col[c], HIGH);
 }
 
-void clear_matrix() {
+void set_matrix(boolean status) {
   for (int i=0; i<9; i++)
-    pixels[i/3][i%3] = false;
+    pixels[i/3][i%3] = status;
 }
 
