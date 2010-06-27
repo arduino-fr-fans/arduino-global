@@ -9,11 +9,16 @@ char pixels[3][3];
 char donottouch[3][3];
 char x=0;
 char y=0;
-boolean lighton=false;
+boolean mode=true;
 
 void setup()   {                
   int i,x,y;
-  //Serial.begin(9600);
+  Serial.begin(9600);
+
+  pinMode(3, OUTPUT);
+  pinMode(4, OUTPUT);
+  digitalWrite(3, LOW);
+  digitalWrite(4, LOW);
 
   for(i=0; i<3; i++) {
     pinMode(row[i], OUTPUT);
@@ -23,22 +28,45 @@ void setup()   {
 
   for(x=0; x<3; x++){
     for(y=0; y<3; y++) {
-      pixels[x][y] = HIGH;
+      pixels[x][y] = false;
     }
   }
 }
 
 void loop()                     
 {
-  display(0,0);
-  display(0,1);
-  display(0,2);
-  display(1,0);
-  display(1,1);
-  display(1,2);
-  display(2,0);
-  display(2,1);
-  display(2,2);
+  if (Serial.available() > 0) {
+    char inByte = Serial.read();
+
+    switch (inByte) {
+      case '+':
+        mode = true;
+        break;
+      case '-':
+        mode = false;
+	break;
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+        int val = atoi(&inByte);
+	pixels[val/3][val%3] = mode;
+    }
+  }
+
+  for(int i=0; i<3; i++) {
+    for(int j=0; j<3; j++) {
+      if(pixels[i][j]) {
+        display(i, j);
+      }
+    }
+  }
 }
 
 void display(char r, char c) {
