@@ -4,5 +4,6 @@
 void on(char, char);
 void off(char, char);
 void display(char, char);
+void clear_matrix();
 
 #endif

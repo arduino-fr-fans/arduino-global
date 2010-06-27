@@ -26,11 +26,7 @@ void setup()   {
     digitalWrite(col[i], HIGH);
   }
 
-  for(x=0; x<3; x++){
-    for(y=0; y<3; y++) {
-      pixels[x][y] = false;
-    }
-  }
+  clear_matrix();
 }
 
 void loop()                     
@@ -39,6 +35,9 @@ void loop()
     char inByte = Serial.read();
 
     switch (inByte) {
+      case 'a':
+        clear_matrix();
+        break;
       case '+':
         mode = true;
         break;
@@ -57,6 +56,7 @@ void loop()
       case '9':
         int val = atoi(&inByte);
 	pixels[val/3][val%3] = mode;
+	break;
     }
   }
 
@@ -83,5 +83,10 @@ void on(char r, char c) {
 void off(char r, char c) {
   digitalWrite(row[r], LOW);
   digitalWrite(col[c], HIGH);
+}
+
+void clear_matrix() {
+  for (int i=0; i<9; i++)
+    pixels[i/3][i%3] = false;
 }
 
