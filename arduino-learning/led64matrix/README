@@ -1,0 +1,7 @@
+Project which propose to run a 64 leds (8x8) matrix.
+You will need :
+  - 1 x 74HC238
+  - 1 x 74HC595
+  - 1 x 8x8 Led Matrix
+  - 1 x Arduino
+  - Lots of wires :-)
