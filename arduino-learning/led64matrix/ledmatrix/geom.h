@@ -9,18 +9,17 @@ struct _Buffer {
 
 
 typedef unsigned char uchar;
+typedef unsigned int uint;
 typedef struct _Buffer Buffer;
-
-extern void drawPixel(uchar, uchar);
-extern void drawLine(uchar, uchar, uchar, uchar);
 
 /** 
  * Buffer
  */
 extern Buffer* buffer_init(Buffer*);
-extern Buffer* buffer_addPixel(Buffer*, uchar, uchar);
-extern Buffer* buffer_addLine(Buffer*, uchar, uchar, uchar, uchar);
+extern Buffer* buffer_addPixel(Buffer*, uint, uint);
+extern Buffer* buffer_addLine(Buffer*, uint, uint, uint, uint);
 extern void buffer_draw(const Buffer*);
-extern Buffer* buffer_translate(Buffer*, uchar, uchar);
+extern Buffer* buffer_translate(Buffer*, int, int);
 extern Buffer* buffer_cpy(const Buffer*, Buffer*);
+extern Buffer* buffer_addCircle(Buffer* buf, uint, uint, uint);
 #endif

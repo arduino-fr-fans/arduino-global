@@ -14,7 +14,7 @@ extern Buffer* buffer_init(Buffer* buf) {
   return buf;
 }
 
-extern Buffer* buffer_addPixel(Buffer* buf, uchar x, uchar y) {
+extern Buffer* buffer_addPixel(Buffer* buf, uint x, uint y) {
   buf->content[x] |= 1<<y;
   return buf;
 }
@@ -22,7 +22,7 @@ extern Buffer* buffer_addPixel(Buffer* buf, uchar x, uchar y) {
 /**
  * Thanks to Bresenham !
  */
-extern Buffer* buffer_addLine(Buffer* buf, uchar x1, uchar y1, uchar x2, uchar y2) {
+extern Buffer* buffer_addLine(Buffer* buf, uint x1, uint y1, uint x2, uint y2) {
   int dx,dy,e,ystep,y,x;
   boolean steep;
   
@@ -83,7 +83,7 @@ void _swap(uchar* v1, uchar* v2) {
   */
 }
 
-extern Buffer* buffer_translate(Buffer* buf, uchar x, uchar y) {
+extern Buffer* buffer_translate(Buffer* buf, int x, int y) {
   char i;
   Buffer buf2;
   
@@ -101,13 +101,10 @@ extern Buffer* buffer_translate(Buffer* buf, uchar x, uchar y) {
     buffer_cpy(buf, &buf2);
     buffer_init(buf);
     
-    if (x > 0) {
-      for (i=0; i<buf2.length-x; i++)
-        buf->content[i+x] = buf2.content[i];
-    } else if (x < 0) {
-      for (i=abs(x); i<buf2.length; i++)
-        buf->content[i+x] = buf2.content[i];
-    }
+    int beg = x>0 ? 0 : abs(x);
+    int end = x>0 ? buf2.length-x : buf2.length;
+    for (i=beg; i<end; i++)
+      buf->content[i+x] = buf2.content[i];
   }
   
   return buf;
@@ -120,3 +117,47 @@ extern Buffer* buffer_cpy(const Buffer* src, Buffer* dst) {
   
   return dst;
 }
+
+/**
+ * Bresenham rocks ! (and wikipedia too)
+ */
+extern Buffer* buffer_addCircle(Buffer* buf, uint cx, uint cy, uint radius)
+{
+  int error = -radius;
+  int x = radius;
+  int y = 0;
+ 
+  while (x >= y) {
+    _plot8points(buf, cx, cy, x, y);
+    
+    error += y;
+    ++y;
+    error += y;
+    
+    if (error >= 0) {
+      --x;
+      error -= x;
+      error -= x;
+    }
+  }
+  
+  return buf;
+}
+ 
+void _plot8points(Buffer* buf, uint cx, uint cy, int x, int y) {
+  _plot4points(buf, cx, cy, x, y);
+  if (x != y)
+    _plot4points(buf, cx, cy, y, x);
+}
+
+void _plot4points(Buffer* buf, uint cx, uint cy, int x, int y) {
+  buffer_addPixel(buf, cx + x, cy + y);
+
+  if (x != 0)
+    buffer_addPixel(buf, cx - x, cy + y);
+  if (y != 0)
+    buffer_addPixel(buf, cx + x, cy - y);
+  if (x != 0 && y != 0)
+    buffer_addPixel(buf, cx - x, cy - y);
+}
+
