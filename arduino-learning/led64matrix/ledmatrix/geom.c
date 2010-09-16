@@ -3,23 +3,26 @@
 #include "utils.h"
 #include "geom.h"
 
-extern void buffer_init(Buffer* buf) {
+extern Buffer* buffer_init(Buffer* buf) {
   char i;
   
   buf->length = LEDMATRIX_COLS;
   
   for(i=0; i<buf->length; i++)
     buf->content[i] = 0;
+    
+  return buf;
 }
 
-extern void buffer_addPixel(Buffer* buf, uchar x, uchar y) {
+extern Buffer* buffer_addPixel(Buffer* buf, uchar x, uchar y) {
   buf->content[x] |= 1<<y;
+  return buf;
 }
 
 /**
  * Thanks to Bresenham !
  */
-extern void buffer_addLine(Buffer* buf, uchar x1, uchar y1, uchar x2, uchar y2) {
+extern Buffer* buffer_addLine(Buffer* buf, uchar x1, uchar y1, uchar x2, uchar y2) {
   int dx,dy,e,ystep,y,x;
   boolean steep;
   
@@ -51,6 +54,8 @@ extern void buffer_addLine(Buffer* buf, uchar x1, uchar y1, uchar x2, uchar y2) 
       e += dx;
     }
   }
+  
+  return buf;
 }
 
 extern void buffer_draw(const Buffer* buf) {
@@ -76,4 +81,42 @@ void _swap(uchar* v1, uchar* v2) {
   *v2 = (*v1) / (*v2);
   *v1 = (*v1) / (*v2);
   */
+}
+
+extern Buffer* buffer_translate(Buffer* buf, uchar x, uchar y) {
+  char i;
+  Buffer buf2;
+  
+  if (y != 0) {
+    for(i=0; i<buf->length; i++) {
+      if ( y > 0 )
+        buf->content[i] <<= y;
+      else
+        buf->content[i] >>= abs(y);
+    }
+  }
+  
+  if ( x != 0 ) {
+    // Copy and drop primary buf
+    buffer_cpy(buf, &buf2);
+    buffer_init(buf);
+    
+    if (x > 0) {
+      for (i=0; i<buf2.length-x; i++)
+        buf->content[i+x] = buf2.content[i];
+    } else if (x < 0) {
+      for (i=abs(x); i<buf2.length; i++)
+        buf->content[i+x] = buf2.content[i];
+    }
+  }
+  
+  return buf;
+}
+extern Buffer* buffer_cpy(const Buffer* src, Buffer* dst) {
+  char i;
+  buffer_init(dst);
+  for(i=0; i<src->length; i++)
+    dst->content[i] = src->content[i];
+  
+  return dst;
 }
