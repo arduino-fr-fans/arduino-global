@@ -4,9 +4,14 @@
 #include "geom.h"
 
 extern Buffer* buffer_init(Buffer* buf) {
-  char i;
-  
   buf->length = LEDMATRIX_COLS;
+  //buf->content = (byte*)malloc(LEDMATRIX_COLS*sizeof(byte));
+  
+  return buffer_reset(buf);
+}
+
+extern Buffer* buffer_reset(Buffer* buf) {
+  uint i;
   
   for(i=0; i<buf->length; i++)
     buf->content[i] = 0;
@@ -59,16 +64,32 @@ extern Buffer* buffer_addLine(Buffer* buf, uint x1, uint y1, uint x2, uint y2) {
 }
 
 extern void buffer_draw(const Buffer* buf) {
+  buffer_draw_with_duration(buf, 0);
+}
+
+extern void buffer_draw_with_duration(const Buffer* buf, uint duration) {
   char i;
-  for (i=0; i<buf->length; i++) {
-    // if at least one pixel is on for this column
-    if(buf->content[i] > 0) {
-      setDisplay(false);
-      sendToShiftRegister(buf->content[i]);
-      setColHigh(i);
-      setDisplay(true);
-    }
-  }
+  unsigned long currentMillis = millis();
+  unsigned long initialMillis = currentMillis;
+  
+  // Display until we reach 'duration' milliseconds
+  while (currentMillis - initialMillis <= duration) {
+    // Display once
+    for (i=0; i<buf->length; i++) {
+      buffer_draw_col(buf, i);
+      // delay 0 avoid flickering and provide a better light
+      delay(0);
+    } // for
+    
+    currentMillis = millis();
+  } // while
+}
+
+extern void buffer_draw_col(const Buffer* buf, uint col) {
+  setDisplay(false);
+  setColHigh(col);
+  sendToShiftRegister(buf->content[col]);
+  setDisplay(true);
 }
 
 void _swap(uchar* v1, uchar* v2) {
@@ -98,8 +119,9 @@ extern Buffer* buffer_translate(Buffer* buf, int x, int y) {
   
   if ( x != 0 ) {
     // Copy and drop primary buf
+    buffer_init(&buf2);
     buffer_cpy(buf, &buf2);
-    buffer_init(buf);
+    buffer_reset(buf);
     
     int beg = x>0 ? 0 : abs(x);
     int end = x>0 ? buf2.length-x : buf2.length;
@@ -109,9 +131,22 @@ extern Buffer* buffer_translate(Buffer* buf, int x, int y) {
   
   return buf;
 }
+
+extern Buffer* buffer_scroll(Buffer* buf, uchar direction) {
+  
+}
+
+extern Buffer* buffer_invert(Buffer* buf) {
+  /* Invert buffer. Each 0 is transformed in 1 and vice versa */
+  char i;
+  for(i=0; i<buf->length; i++)
+    buf->content[i] = ~buf->content[i];
+  
+  return buf;
+}
+
 extern Buffer* buffer_cpy(const Buffer* src, Buffer* dst) {
   char i;
-  buffer_init(dst);
   for(i=0; i<src->length; i++)
     dst->content[i] = src->content[i];
   
@@ -160,4 +195,5 @@ void _plot4points(Buffer* buf, uint cx, uint cy, int x, int y) {
   if (x != 0 && y != 0)
     buffer_addPixel(buf, cx - x, cy - y);
 }
+
 

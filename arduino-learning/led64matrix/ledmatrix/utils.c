@@ -34,3 +34,4 @@ extern void display_matrix(unsigned char m[LEDMATRIX_ROWS][LEDMATRIX_COLS], unsi
   MUX_ACTIVATE (false);
 }
 */
+

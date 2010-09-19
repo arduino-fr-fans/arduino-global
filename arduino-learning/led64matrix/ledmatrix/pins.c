@@ -64,3 +64,4 @@ void setColHigh(unsigned char c) {
   digitalWrite(MUX_B, MUX_GET_B(offset));
   digitalWrite(MUX_C, MUX_GET_C(offset));
 }
+
