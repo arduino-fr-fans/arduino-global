@@ -10,67 +10,73 @@ extern "C" {
   #include "geom.h"
 
 
-  #define TIME 500
-  long previousMillis = 0;
-  long interval = TIME; 
-  unsigned long currentMillis;
-  uint dx=1;
-  int way=1;
-  uchar cpt = 0;
-  
-  #define NB_LINES 4
-  uchar pat1[NB_LINES][4] = {
-    {2,1,2,3},
-    {1,1,3,3},
-    {1,2,3,2},
-    {3,1,1,3}
-  };
-  Buffer buffers1[NB_LINES];
-  Buffer buffers2[NB_LINES];
-  Buffer buffers3[NB_LINES];
-  Buffer buffers4[NB_LINES];
-  Buffer buf;
+  Buffer buf, buf2;
 
   void setup() {
     Serial.begin(9600);
     setupPins();
     
-    for (int i=0; i<NB_LINES; i++) {
-      buffer_init(&buffers1[i]);
-      buffer_init(&buffers2[i]);
-      buffer_init(&buffers3[i]);
-      buffer_init(&buffers4[i]);
-      
-      //buffer_addLine(&buffers1[i], pat1[i][0], pat1[i][1], pat1[i][2], pat1[i][3]);
-
-      //buffer_cpy(&buffers1[i], &buffers2[i]);
-      //buffer_translate(&buffers2[i], 3, 3);
-      //buffer_translate(&buffers2[i], -3, -3);
-    }
-    
     buffer_init(&buf);
+    buffer_init(&buf2);
+    buffer_invert(&buf2);
     buffer_addCircle(&buf, 4, 4, 3);
     buffer_addPixel(&buf, 3, 5);
     buffer_addPixel(&buf, 5, 5);
     buffer_addLine(&buf, 3, 3, 5, 3);
-//    buffer_translate(&buf, -1, 1);
+    buffer_translate(&buf, -1, -1);
+    
     setDisplay(true);
   }
   
-  void loop() {
-    buffer_draw(&buf);
+  
+/*******************************  
+ **********   DEMOS   **********
+ *******************************/
+  
+  void demo_smiley() {
+    unsigned char pos;
+    char way[4][2] = {
+      {1,0},
+      {0,1},
+      {-1,0},
+      {0,-1}
+    };
     
-    currentMillis = millis();
-    if(currentMillis - previousMillis > interval) {
-      previousMillis = currentMillis;
-
-      if (cpt == 2) {
-        cpt = 0;
-        way = -way;
-      }
+    while (1) {
+      buffer_draw_with_duration(&buf, 50);
+      buffer_translate(&buf, way[pos][0], way[pos][1]);
+      pos = (pos+1) % 4;
+    } // while
+  }
+  
+  void demo_scrolling() {
+    byte bigb[128];
+    byte* currentb;
+    Buffer b;
+    
+    b.length = LEDMATRIX_COLS;
+    currentb = bigb;
+    
+    // Initialisation of bigb
+    for(int i=0; i<128; i++)
+      bigb[i] = buf.content[i%8];
+    
+    for(int i=0; i<120; i++) {
+      buffer_draw_with_duration(&b, 70);
       
-      cpt ++;
-      //buffer_translate(&buf, way, 0);
+      // Copy new buffer
+      for(int j=0; j<8; j++)
+        b.content[j] = bigb[i+j];
     }
   }
+  
+/*******************************  
+ ********** Main loop **********
+ *******************************/
+ 
+  void loop() {
+    //demo_smiley();
+    demo_scrolling();
+  }
 }
+
