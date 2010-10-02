@@ -5,9 +5,16 @@
 
 extern Buffer* buffer_init(Buffer* buf) {
   buf->length = LEDMATRIX_COLS;
-  //buf->content = (byte*)malloc(LEDMATRIX_COLS*sizeof(byte));
+  buf->content = (byte*)malloc(LEDMATRIX_COLS*sizeof(byte));
   
   return buffer_reset(buf);
+}
+
+extern Buffer* buffer_destroy(Buffer* buf) {
+  free (buf->content);
+  buf->length=0;
+  
+  return buf;
 }
 
 extern Buffer* buffer_reset(Buffer* buf) {
@@ -77,8 +84,8 @@ extern void buffer_draw_with_duration(const Buffer* buf, uint duration) {
     // Display once
     for (i=0; i<buf->length; i++) {
       buffer_draw_col(buf, i);
-      // delay 0 avoid flickering and provide a better light
-      delay(0);
+      // delay 0 avoid flickering and provide a better light before arduino-0020
+      delay(1);
     } // for
     
     currentMillis = millis();
@@ -130,10 +137,6 @@ extern Buffer* buffer_translate(Buffer* buf, int x, int y) {
   }
   
   return buf;
-}
-
-extern Buffer* buffer_scroll(Buffer* buf, uchar direction) {
-  
 }
 
 extern Buffer* buffer_invert(Buffer* buf) {
@@ -195,5 +198,4 @@ void _plot4points(Buffer* buf, uint cx, uint cy, int x, int y) {
   if (x != 0 && y != 0)
     buffer_addPixel(buf, cx - x, cy - y);
 }
-
 

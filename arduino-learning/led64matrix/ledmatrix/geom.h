@@ -3,7 +3,7 @@
 #include "pins.h"
 
 struct _Buffer {
-  byte content[LEDMATRIX_COLS];
+  byte* content;
   unsigned char length;
 };
 
@@ -21,6 +21,7 @@ typedef struct _Buffer Buffer;
  * Buffer
  */
 extern Buffer* buffer_init(Buffer*);
+extern Buffer* buffer_destroy(Buffer*);
 extern Buffer* buffer_reset(Buffer*);
 extern Buffer* buffer_addPixel(Buffer*, uint, uint);
 extern Buffer* buffer_addLine(Buffer*, uint, uint, uint, uint);
