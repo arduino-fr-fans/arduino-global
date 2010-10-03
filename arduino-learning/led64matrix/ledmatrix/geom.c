@@ -18,7 +18,7 @@ extern Buffer* buffer_destroy(Buffer* buf) {
 }
 
 extern Buffer* buffer_reset(Buffer* buf) {
-  uint i;
+  uchar i;
   
   for(i=0; i<buf->length; i++)
     buf->content[i] = 0;

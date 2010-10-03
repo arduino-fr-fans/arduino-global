@@ -2,15 +2,14 @@
 #define __GEOM_HEADER__
 #include "pins.h"
 
-struct _Buffer {
-  byte* content;
-  unsigned char length;
-};
-
-
 typedef unsigned char uchar;
 typedef unsigned int uint;
 typedef struct _Buffer Buffer;
+
+struct _Buffer {
+  byte* content;
+  uchar length;
+};
 
 #define LEFT 0
 #define RIGHT 1
