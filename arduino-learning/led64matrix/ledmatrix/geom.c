@@ -274,5 +274,24 @@ extern Buffer* buffer_assemble(Buffer* dst, const Buffer* buf1, const Buffer* bu
   // Restore content
   dst->content_beg = old_content;
   
+  buffer_reinit(dst);
+  
   return dst;
+}
+
+extern Buffer* buffer_add(Buffer* dst, const Buffer* toadd) {
+  byte* backup;
+  uchar length;
+
+  length = dst->length + toadd->length;
+  dst->content_beg = (byte*)realloc(dst->content_beg, length * sizeof(byte));
+
+  backup = dst->content_beg;
+  dst->content_beg += dst->length;
+  
+  buffer_cpy(toadd, dst);
+  dst->content_beg = backup;
+  dst->length = length;
+  
+  buffer_reinit(dst);
 }

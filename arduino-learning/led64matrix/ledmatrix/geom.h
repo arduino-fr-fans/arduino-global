@@ -44,5 +44,6 @@ extern Buffer* buffer_invert(Buffer*);
 extern Buffer* buffer_cpy(const Buffer*, Buffer*);
 extern Buffer* buffer_addCircle(Buffer* buf, uint, uint, uint);
 extern Buffer* buffer_assemble(Buffer*, const Buffer*, const Buffer*);
+extern Buffer* buffer_add(Buffer*, const Buffer*);
 #endif
 

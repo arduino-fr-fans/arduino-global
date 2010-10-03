@@ -8,26 +8,54 @@ extern "C" {
   #include "utils.h"
   #include "pins.h"
   #include "geom.h"
+  #include "letters.h"
   
-  Buffer buf1, buf2, buf3;
+  Buffer smiley, buf1, buf2, buf3, buftest;
 
   void setup() {
     Serial.begin(9600);
     setupPins();
     
-    buffer_init(&buf1);
-    buffer_reset(&buf1);
-    buffer_addCircle(&buf1, 4, 4, 3);
-    buffer_addPixel(&buf1, 3, 5);
-    buffer_addPixel(&buf1, 5, 5);
-    buffer_addLine(&buf1, 3, 3, 5, 3);
-    buffer_translate(&buf1, -1, -1);
+    buffer_init(&smiley);
+    buffer_reset(&smiley);
+    buffer_addCircle(&smiley, 4, 4, 3);
+    buffer_addPixel(&smiley, 3, 5);
+    buffer_addPixel(&smiley, 5, 5);
+    buffer_addLine(&smiley, 3, 3, 5, 3);
+    buffer_translate(&smiley, -1, -1);
     
-    // Make buf2 as long as double buf1
-    buffer_init(&buf2);
-    buffer_cpy(&buf1, &buf2);
-    buffer_translate(&buf2, 1, 1);
-    buffer_assemble(&buf3, &buf1, &buf2);
+    
+    buffer_init(&buf1);
+    buffer_init_with_length(&buf2, 1);
+    buffer_init(&buf3);
+    
+    letter_set_to_buf(&buf1, PATTERN_F);
+    buffer_add(&buf3, &buf1);
+    
+    buffer_add(&buf3, &buf2);
+    
+    letter_set_to_buf(&buf1, PATTERN_A);
+    buffer_add(&buf3, &buf1);
+    
+    buffer_add(&buf3, &buf2);
+    
+    letter_set_to_buf(&buf1, PATTERN_I);
+    buffer_add(&buf3, &buf1);
+    
+    buffer_add(&buf3, &buf2);
+    
+    letter_set_to_buf(&buf1, PATTERN_L);
+    buffer_add(&buf3, &buf1);
+    
+    buffer_add(&buf3, &buf2);
+    
+    letter_set_to_buf(&buf1, PATTERN_EXCLAMATION);
+    buffer_add(&buf3, &buf1);
+    buffer_add(&buf3, &buf2);
+    buffer_add(&buf3, &buf2);
+    buffer_add(&buf3, &buf2);
+    buffer_add(&buf3, &buf2);
+    buffer_add(&buf3, &buf2);
     
     setDisplay(true);
   }
@@ -47,18 +75,18 @@ extern "C" {
     };
     
     while (1) {
-      buffer_draw_with_duration(&buf1, 100);
-      buffer_translate(&buf1, way[pos][0], way[pos][1]);
+      buffer_draw_with_duration(&smiley, 100);
+      buffer_translate(&smiley, way[pos][0], way[pos][1]);
       pos = (pos+1) % 4;
     } // while
   }
 
-  uchar dir = LEFT;
   void demo_scrolling() {
     buffer_draw_with_duration(&buf3, 150);
-    if( !buffer_scroll(&buf3, dir) ) {
-      dir = (dir == LEFT) ? RIGHT : LEFT;
-    }
+    buffer_scroll(&buf3, LEFT);
+
+    if (buf3.length_left <= buf3.display_width)
+      buffer_reinit(&buf3);
   }
 
   
@@ -69,7 +97,6 @@ extern "C" {
   void loop() {
     //demo_smiley();
     demo_scrolling();
-    //buffer_draw_with_duration(&buf2, 150);
   }
 }
 

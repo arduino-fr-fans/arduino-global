@@ -3,7 +3,6 @@
 #include <WProgram.h>
 // Arduino pins definition
 
-#define LEDMATRIX_ROWS 8
 #define LEDMATRIX_COLS 8
 
 /**
