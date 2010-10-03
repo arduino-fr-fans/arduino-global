@@ -11,9 +11,7 @@ extern "C" {
   
   #define SCROLL_BUFFFER_SIZE (LEDMATRIX_COLS*2)
 
-
   Buffer buf, buf2;
-  byte content[SCROLL_BUFFFER_SIZE];
 
   void setup() {
     Serial.begin(9600);
@@ -26,8 +24,7 @@ extern "C" {
     buffer_addLine(&buf, 3, 3, 5, 3);
     buffer_translate(&buf, -1, -1);
     
-    buf2.length=LEDMATRIX_COLS;
-    buf2.content=content;
+    buffer_init_with_length(&buf2, SCROLL_BUFFFER_SIZE);
     for(int i=0; i<SCROLL_BUFFFER_SIZE; i++) {
       buf2.content[i] = buf.content[i%8];
     }
@@ -56,15 +53,11 @@ extern "C" {
     } // while
   }
 
-  char cpt=0;
+  uchar dir = LEFT;
   void demo_scrolling() {
     buffer_draw_with_duration(&buf2, 150);
-    buf2.content++;
-    cpt++;
-    
-    if(cpt == SCROLL_BUFFFER_SIZE - LEDMATRIX_COLS) {
-      cpt=0;
-      buf2.content=content;
+    if( !buffer_scroll(&buf2, dir) ) {
+      dir = (dir == LEFT) ? RIGHT : LEFT;
     }
   }
 

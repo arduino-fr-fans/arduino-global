@@ -4,30 +4,46 @@
 #include "geom.h"
 
 extern Buffer* buffer_init(Buffer* buf) {
-  buf->length = LEDMATRIX_COLS;
-  buf->content = (byte*)malloc(LEDMATRIX_COLS*sizeof(byte));
+  buffer_init_with_length(buf, LEDMATRIX_COLS);
+}
+
+extern Buffer* buffer_init_with_length(Buffer* buf, uchar length) {
+  buf->length = length;
+  buf->length_left = buf->length;
+  buf->display_width=LEDMATRIX_COLS;
+  buf->content_beg = (byte*)malloc(length*sizeof(byte));
+  buf->content = buf->content_beg;
   
   return buffer_reset(buf);
 }
 
 extern Buffer* buffer_destroy(Buffer* buf) {
-  free (buf->content);
+  free (buf->content_beg);
   buf->length=0;
+  buf->length_left=0;
   
   return buf;
+}
+
+/**
+ * Reinitialize a buffer to begining
+ */
+extern Buffer* buffer_reinit(Buffer* buf) {
+  buf->length_left = buf->length;
+  buf->content = buf->content_beg;
 }
 
 extern Buffer* buffer_reset(Buffer* buf) {
   uchar i;
   
   for(i=0; i<buf->length; i++)
-    buf->content[i] = 0;
+    buf->content_beg[i] = 0;
     
   return buf;
 }
 
 extern Buffer* buffer_addPixel(Buffer* buf, uint x, uint y) {
-  buf->content[x] |= 1<<y;
+  buf->content_beg[x] |= 1<<y;
   return buf;
 }
 
@@ -75,16 +91,16 @@ extern void buffer_draw(const Buffer* buf) {
 }
 
 extern void buffer_draw_with_duration(const Buffer* buf, uint duration) {
-  char i;
+  uchar i;
   unsigned long currentMillis = millis();
   unsigned long initialMillis = currentMillis;
   
   // Display until we reach 'duration' milliseconds
   while (currentMillis - initialMillis <= duration) {
     // Display once
-    for (i=0; i<buf->length; i++) {
+    for (i=0; i<buf->display_width; i++) {
       buffer_draw_col(buf, i);
-      // delay 0 avoid flickering and provide a better light before arduino-0020
+      // delay 0 avoid flickering and provide a better light - before arduino release 0019 ;-)
       delay(1);
     } // for
     
@@ -118,32 +134,70 @@ extern Buffer* buffer_translate(Buffer* buf, int x, int y) {
   if (y != 0) {
     for(i=0; i<buf->length; i++) {
       if ( y > 0 )
-        buf->content[i] <<= y;
+        buf->content_beg[i] <<= y;
       else
-        buf->content[i] >>= abs(y);
+        buf->content_beg[i] >>= abs(y);
     }
   }
   
   if ( x != 0 ) {
     // Copy and drop primary buf
-    buffer_init(&buf2);
+    buffer_init_with_length(&buf2, buf->length);
     buffer_cpy(buf, &buf2);
     buffer_reset(buf);
     
     int beg = x>0 ? 0 : abs(x);
     int end = x>0 ? buf2.length-x : buf2.length;
     for (i=beg; i<end; i++)
-      buf->content[i+x] = buf2.content[i];
+      buf->content_beg[i+x] = buf2.content_beg[i];
   }
   
   return buf;
+}
+
+/**
+ * Set content of a buffer
+ * Nothing beeing freed !
+ */
+extern Buffer* buffer_set_content(Buffer* buf, const byte* content, uchar length) {
+  buffer_destroy(buf);
+  buf->content = content;
+  buf->content_beg = buf->content;
+  buf->length  = length;
+  buf->length_left = length;
+}
+
+/**
+ * Scroll buffer content by one on LEFT or RIGHT direction
+ */
+extern boolean buffer_scroll(Buffer* buf, uchar dir) {
+  boolean ret=true;
+  
+  switch(dir) {
+    case LEFT:
+      if ( (ret = buf->length_left > buf->display_width) ) {
+        buf->content++;
+        buf->length_left--;
+      }
+      break;
+    case RIGHT:
+      if( (ret = buf->length_left < buf->length) ) {
+        buf->content--;
+        buf->length_left++;
+      }
+      break;
+    default:
+      ret=false;
+  }
+  
+  return ret;
 }
 
 extern Buffer* buffer_invert(Buffer* buf) {
   /* Invert buffer. Each 0 is transformed in 1 and vice versa */
   char i;
   for(i=0; i<buf->length; i++)
-    buf->content[i] = ~buf->content[i];
+    buf->content_beg[i] = ~buf->content_beg[i];
   
   return buf;
 }
@@ -151,7 +205,7 @@ extern Buffer* buffer_invert(Buffer* buf) {
 extern Buffer* buffer_cpy(const Buffer* src, Buffer* dst) {
   char i;
   for(i=0; i<src->length; i++)
-    dst->content[i] = src->content[i];
+    dst->content_beg[i] = src->content_beg[i];
   
   return dst;
 }
