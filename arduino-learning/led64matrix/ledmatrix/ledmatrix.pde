@@ -9,25 +9,25 @@ extern "C" {
   #include "pins.h"
   #include "geom.h"
   
-  #define SCROLL_BUFFFER_SIZE (LEDMATRIX_COLS*2)
-
-  Buffer buf, buf2;
+  Buffer buf1, buf2, buf3;
 
   void setup() {
     Serial.begin(9600);
     setupPins();
     
-    buffer_init(&buf);
-    buffer_addCircle(&buf, 4, 4, 3);
-    buffer_addPixel(&buf, 3, 5);
-    buffer_addPixel(&buf, 5, 5);
-    buffer_addLine(&buf, 3, 3, 5, 3);
-    buffer_translate(&buf, -1, -1);
+    buffer_init(&buf1);
+    buffer_reset(&buf1);
+    buffer_addCircle(&buf1, 4, 4, 3);
+    buffer_addPixel(&buf1, 3, 5);
+    buffer_addPixel(&buf1, 5, 5);
+    buffer_addLine(&buf1, 3, 3, 5, 3);
+    buffer_translate(&buf1, -1, -1);
     
-    buffer_init_with_length(&buf2, SCROLL_BUFFFER_SIZE);
-    for(int i=0; i<SCROLL_BUFFFER_SIZE; i++) {
-      buf2.content[i] = buf.content[i%8];
-    }
+    // Make buf2 as long as double buf1
+    buffer_init(&buf2);
+    buffer_cpy(&buf1, &buf2);
+    buffer_translate(&buf2, 1, 1);
+    buffer_assemble(&buf3, &buf1, &buf2);
     
     setDisplay(true);
   }
@@ -47,16 +47,16 @@ extern "C" {
     };
     
     while (1) {
-      buffer_draw_with_duration(&buf, 100);
-      buffer_translate(&buf, way[pos][0], way[pos][1]);
+      buffer_draw_with_duration(&buf1, 100);
+      buffer_translate(&buf1, way[pos][0], way[pos][1]);
       pos = (pos+1) % 4;
     } // while
   }
 
   uchar dir = LEFT;
   void demo_scrolling() {
-    buffer_draw_with_duration(&buf2, 150);
-    if( !buffer_scroll(&buf2, dir) ) {
+    buffer_draw_with_duration(&buf3, 150);
+    if( !buffer_scroll(&buf3, dir) ) {
       dir = (dir == LEFT) ? RIGHT : LEFT;
     }
   }

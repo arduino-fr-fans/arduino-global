@@ -4,7 +4,7 @@
 #include "geom.h"
 
 extern Buffer* buffer_init(Buffer* buf) {
-  buffer_init_with_length(buf, LEDMATRIX_COLS);
+  return buffer_init_with_length(buf, LEDMATRIX_COLS);
 }
 
 extern Buffer* buffer_init_with_length(Buffer* buf, uchar length) {
@@ -14,7 +14,7 @@ extern Buffer* buffer_init_with_length(Buffer* buf, uchar length) {
   buf->content_beg = (byte*)malloc(length*sizeof(byte));
   buf->content = buf->content_beg;
   
-  return buffer_reset(buf);
+  return buf;
 }
 
 extern Buffer* buffer_destroy(Buffer* buf) {
@@ -204,6 +204,7 @@ extern Buffer* buffer_invert(Buffer* buf) {
 
 extern Buffer* buffer_cpy(const Buffer* src, Buffer* dst) {
   char i;
+  
   for(i=0; i<src->length; i++)
     dst->content_beg[i] = src->content_beg[i];
   
@@ -253,3 +254,25 @@ void _plot4points(Buffer* buf, uint cx, uint cy, int x, int y) {
     buffer_addPixel(buf, cx - x, cy - y);
 }
 
+/**
+ * Assemble Buf1 and Buf2 into dst buffer
+ * dst must be a *valid buffer*, but *should not be initialized*
+ */
+extern Buffer* buffer_assemble(Buffer* dst, const Buffer* buf1, const Buffer* buf2) {
+  byte* old_content;
+  
+  buffer_init_with_length(dst, buf1->length+buf2->length);
+  
+  /* Copy first buffer */
+  buffer_cpy(buf1, dst);
+  
+  /* Copy second buffer */
+  // Backup 
+  old_content = dst->content_beg;
+  dst->content_beg += buf1->length;
+  buffer_cpy(buf2, dst);
+  // Restore content
+  dst->content_beg = old_content;
+  
+  return dst;
+}
