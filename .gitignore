@@ -15,3 +15,11 @@ generated
 *~
 .settings
 build-cli
+*.GBO
+*.GBS
+*.GTO
+*.GTS
+*.GBL
+*.GTL
+*.pro
+*.GTP
